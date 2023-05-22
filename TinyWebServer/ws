@@ -1,0 +1,135 @@
+搭建一个web server
+
+
+大端字节序 一个整数的高位字节存储在内存的低地址处 低位字节存储在内存的高地址处
+小端字节序 一个整数的高位字节存储在内存的高地址处 低位字节存储在内存的低地址处
+现代PC大多采用小端字节序 所以又叫主机字节序
+网络传输多用大端字节序 所以又叫网络字节序
+
+
+socket网络编程
+
+首先调用socket(domain, type, protocol)创建一个socket
+domain指定底层协议族 如果是TCP/IP协议族 应指定为PF_INET
+type指定服务类型 SOCK_STREAM服务即流服务和SOCK_UGRAM服务即数据报服务 对于domain指定了TCP/IP协议 取SOCK_STREAM表示传输层使用TCP协议
+protocol表示在前两个参数构成的协议集合下再选择一个具体协议  基本上设置为0 表示使用默认协议
+
+接着为创建的socket命名 在创建时为socket指定了地址族，命名时需要与一个具体的地址进行绑定
+TCP/IP协议族有sockaddr_in和sockaddr_in6两个专用socket地址结构体，分别用于ipv4和ipv6
+专用socket地址在实际使用时需要强制转化为通用socket地址类型sockaddr
+sockaddr_in需要指定地址族 ip 端口
+sin_family指定为AF_INET(ipv4网络协议中使用的地址族)
+sin_addr.s_addr指定ip地址 使用常数INADDR_ANY自动获取运行服务器端的计算机ip地址
+sin_port指定端口号 可分配的端口号0-65535 0-1023是知名端口
+ip地址和端口号指定时需要转化为网络字节序即大端字节序 使用字节序转化函数
+htons()/htonl() h代表主机字节序 n代表网络字节序 s代表2个字节short用于端口号转换 l代表4个字节long用于ip地址转换
+调用bind(int sockfd, sockaddr* my_addr, socklen_t addrlen)命名socket 
+addrlen参数指出socket地址的长度
+
+接着调用listen(int sockfd, int backlog)监听socket
+sockfd指定被监听的socket，backlog参数提示内核监听队列的最大长度
+
+调用accept(int sockfd, sockaddr* addr, socklen_t addrlen)接受连接
+sockfd指定调用过listen()的socket
+addr用来获取发出连接的socket地址
+addrlen_t指出addr长度
+函数返回的socket唯一标识了被接受的这个连接，通过这个sockt通信
+
+
+使用epoll让服务器同时持有多个客户端连接
+调用epoll_create()创建保存epoll文件描述符的空间
+epoll_create(int size)size参数只是建议，仅供操作系统参考
+
+调用epoll_ctl()向空间注册并注销文件描述符
+epoll_ctl(int epfd, int op, int fd, epoll_event* event)
+epfd指定epoll文件描述符
+op指定操作 EPOLL_CTL_ADD注册到epfd中 EPOLL_CTL_DEL从epfd中删除 EPOLL_CTL_MOD更改注册的fd的关注事件发生情况
+fd需要注册的文件描述符
+event指定关注的事件类型 使用epoll_event结构体 events指定事件 data.fd指定文件描述符
+EPOLLIN: 需要读取数据的情况
+EPOLLOUT: 输出缓冲为空，可以立即发送数据的情况
+EPOLLPRI: 收到OOB数据的情况
+EPOLLRDHUP: 断开连接或半关闭的情况，这在边缘触发方式下非常有用
+EPOLLERR: 发生错误的情况
+EPOLLET: 以边缘触发的方式得到事件通知
+EPOLLONESHOT: 发生一次事件后，相应文件描述符不再收到事件通知 因此需要向epoll_ctl函数的第二个参数传递EPOLL_CTL_MOD ，再次设置事件
+
+调用epoll_wait(int epfd, epoll_event* events, int maxevents, int timeout)等待文件描述符发生变化
+epfd指定epoll文件描述符
+events指定保存发生事件的文件描述符集合的结构地址 需要动态分配内存
+maxevents指定第二个参数可以保存的最大事件数
+timeout指定等待时间 以1/1000秒为单位的等待时间，传递-1时，一直等待直到发生事件
+
+
+线程池
+调用pthread_create(pthread_t* restrict thread, const pthread_attr_t* restrict attr, void* (* start_routine)(void*), void* restrict arg)创建线程
+thread保存新创建线程ID的变量地址值 定义一个pthread_t类型的变量并传入地址值
+attr用于设置新线程的属性 传递NULL表示使用默认线程属性
+start_routine指定新线程将运行的函数即线程的入口
+arg指定该函数的参数
+
+
+调用pthread_detach(pthread_t thread)确保线程结束后自动销毁
+thread指定线程ID
+
+使用for循环创建一定数量的线程 通过sem.wait()使所有线程沉睡等待唤醒
+通过push()将新的任务需求加入任务队列队尾 并调用sem.post()唤醒线程
+被唤醒线程确保任务队列不为空后取出队头任务进行处理
+任务队列由所有线程共享 属于临界区资源 所有对任务队列的读写操作都需要在mutex加锁后进行
+
+
+LT和ET
+默认LT模式下，事件未被及时处理将不断通知该事件
+ET模式下只通知一次，即使输入缓存中还有数据，也不会再通知
+ET配合非阻塞方式使用 防止让服务器空等待
+
+非阻塞方式
+调用fcntl(int filedes, int cmd, ...)
+向第二个参数传递F_GETFL，可以获得第一个参数所指文件描述符属性，如果传递F_SETFL可以更改文件描述符属性
+int flag = fcntl(fd, F_GETFL, 0);
+fcntl(fd, F_SETFL, flag|O_NONBLOCK0);
+通过第一条语句获取之前设置的属性信息，通过第二条语句在此基础上添加非阻塞O_NONBLOCK标志
+
+EPOLLONESHOT事件
+一个socket可能被多个线程同时操作，使用EPOLLONESHOT可以实现任一时刻只被一个线程处理。
+处理完毕后需要重置EPOLLONESHOT事件，确保socket下一次可读时，其他工作线程有机会处理。
+
+
+信号处理机制
+采用统一事件源的方式 不在信号处理函数中对信号进行处理 而是在信号处理函数中将信号发往主线程中通过epoll例程处理
+调用socketpair(int __domain, int __type, int __protocol, int *__fds)创建管道 将读通道的文件描述符注册到epoll例程中
+通过sigaction(int __sig, const sigaction *__restrict__ __act, sigaction *__restrict__ __oact)设置信号处理函数
+sig参数指出要捕获的信号
+act指定新的信号处理方式
+oact输出信号先前的处理方式
+结构体struct sigaction描述了信号处理的细节
+sa_hander指定信号处理函数
+sa_mask设置进程的信号掩码，以指定哪些信号不能发送给本进程
+sa_flags设置程序收到信号时的行为
+在信号处理函数中通过写通道写入信号
+在下一次epoll_wait时主线程就可以从读通道读出信号值并处理
+
+
+定时器
+在捕获信号中添加SIGALRM信号以捕获时钟信号 通过alarm函数来定时发出超时信号 当超时信号被捕获并发往主线程后 主线程从读通道读出信号值并处理超时任务
+超时任务在本程序中定义为非活动连接 即长时间与服务端无数据交换的客户端连接
+每个创建的客户端连接均会与一个定时器对象绑定并被放进定时器队列中进行管理
+定时器队列以超时时间升序排放 队头总是第一个即将超时的任务
+ClientData类用于存放与服务端连接的客户端数据，并有一个指向与之绑定的定时器的指针
+Timer类有time_t类型成员timeout用于比较不同定时器的超时时间 有一个任务回调函数cbFunc()用于移除非活动连接即端口与客户端的连接 有一个指向与之绑定的ClientData的指针
+ListTimer类使用multiset容器实现定时器队列，并自定义了一个compare函数来比较超时时间而实现定时器升序排放
+每有一个客户端连接 就会将其数据存放在ClientData对象中并创建一个定时器与之绑定
+将新创建的定时器加入定时器队列
+当客户端与服务端有数据交换时会重新更新与该客户端绑定的定时器的超时时间，避免被当作非活动连接而关闭 并调整更新后的定时器在定时器队列中的位置
+在处理超时任务时调用ListTimer类的run()函数 不断从队头取出定时器根据超时时间来处理超时任务
+每处理一个超时任务就需要调用Timer类的任务回调函数cbFunc()完成连接的断开
+
+
+http
+根据http的格式对http请求进行分析
+在Http类中使用枚举类对协议规定好的各种固定方式进行定义 包括请求方法、报文解析结果等
+http报文分为三部分：请求行 请求头 请求内容
+三部分中分为一行或几行内容以回车换行符分隔 且请求头和请求内容中间还有一个空行即只含有回车换行符
+将获得的报文存入字符串中 通过主从状态机的方式对报文进行分析 
+根据主状态机有三种状态即分别指明当前分析处于哪个部分 行、头或内容
+从状态机不断在存放数据的字符串中解析出完整一行 供主状态机中调用相应部分的处理函数分析出报文内容

@@ -1,0 +1,38 @@
+2023-05-20 10:55:27.540840 [info]: Http.cpp:278 GET / HTTP/1.1
+2023-05-20 10:55:27.540900 [info]: Http.cpp:278 Host: 192.168.221.128:9999
+2023-05-20 10:55:27.540907 [info]: Http.cpp:278 Connection: keep-alive
+2023-05-20 10:55:27.540912 [info]: Http.cpp:278 Upgrade-Insecure-Requests: 1
+2023-05-20 10:55:27.540917 [info]: Http.cpp:278 User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.0.0 Safari/537.36 Edg/113.0.1774.50
+2023-05-20 10:55:27.540925 [info]: Http.cpp:278 Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7
+2023-05-20 10:55:27.540930 [info]: Http.cpp:278 Accept-Encoding: gzip, deflate
+2023-05-20 10:55:27.540934 [info]: Http.cpp:278 Accept-Language: zh-CN,zh;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6
+2023-05-20 10:55:27.540938 [info]: Http.cpp:278 
+2023-05-20 10:55:39.292189 [info]: Http.cpp:278 POST /0 HTTP/1.1
+2023-05-20 10:55:39.292298 [info]: Http.cpp:278 Host: 192.168.221.128:9999
+2023-05-20 10:55:39.292310 [info]: Http.cpp:278 Connection: keep-alive
+2023-05-20 10:55:39.292314 [info]: Http.cpp:278 Content-Length: 0
+2023-05-20 10:55:39.292317 [info]: Http.cpp:278 Cache-Control: max-age=0
+2023-05-20 10:55:39.292320 [info]: Http.cpp:278 Upgrade-Insecure-Requests: 1
+2023-05-20 10:55:39.292322 [info]: Http.cpp:278 Origin: http://192.168.221.128:9999
+2023-05-20 10:55:39.292330 [info]: Http.cpp:278 Content-Type: application/x-www-form-urlencoded
+2023-05-20 10:55:39.292333 [info]: Http.cpp:278 User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.0.0 Safari/537.36 Edg/113.0.1774.50
+2023-05-20 10:55:39.292337 [info]: Http.cpp:278 Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7
+2023-05-20 10:55:39.292339 [info]: Http.cpp:278 Referer: http://192.168.221.128:9999/
+2023-05-20 10:55:39.292342 [info]: Http.cpp:278 Accept-Encoding: gzip, deflate
+2023-05-20 10:55:39.292361 [info]: Http.cpp:278 Accept-Language: zh-CN,zh;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6
+2023-05-20 10:55:39.292367 [info]: Http.cpp:278 
+2023-05-20 10:55:46.801405 [info]: Http.cpp:278 POST /3CGISQL.cgi HTTP/1.1
+2023-05-20 10:55:46.801480 [info]: Http.cpp:278 Host: 192.168.221.128:9999
+2023-05-20 10:55:46.801489 [info]: Http.cpp:278 Connection: keep-alive
+2023-05-20 10:55:46.801493 [info]: Http.cpp:278 Content-Length: 28
+2023-05-20 10:55:46.801496 [info]: Http.cpp:278 Cache-Control: max-age=0
+2023-05-20 10:55:46.801498 [info]: Http.cpp:278 Upgrade-Insecure-Requests: 1
+2023-05-20 10:55:46.801501 [info]: Http.cpp:278 Origin: http://192.168.221.128:9999
+2023-05-20 10:55:46.801508 [info]: Http.cpp:278 Content-Type: application/x-www-form-urlencoded
+2023-05-20 10:55:46.801512 [info]: Http.cpp:278 User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.0.0 Safari/537.36 Edg/113.0.1774.50
+2023-05-20 10:55:46.801515 [info]: Http.cpp:278 Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7
+2023-05-20 10:55:46.801518 [info]: Http.cpp:278 Referer: http://192.168.221.128:9999/0
+2023-05-20 10:55:46.801520 [info]: Http.cpp:278 Accept-Encoding: gzip, deflate
+2023-05-20 10:55:46.801523 [info]: Http.cpp:278 Accept-Language: zh-CN,zh;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6
+2023-05-20 10:55:46.801525 [info]: Http.cpp:278 
+2023-05-20 10:55:46.801528 [info]: Http.cpp:278 user=chenlin&password=123456
